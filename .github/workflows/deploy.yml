@@ -10,6 +10,7 @@ permissions:
   contents: read
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   LOCATION: francecentral
   RESOURCE_GROUP: rg-orbit-campaign-test003
   CONTAINER_APP: orbit-campaign-test003
