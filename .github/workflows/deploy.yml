@@ -1,5 +1,5 @@
 name: deploy
-# RBAC refresh trigger after Key Vault Secrets User assignment for id-orbit-campaign-test003
+# RBAC propagation refresh after Key Vault Secrets User assignment for id-orbit-campaign-test003
 
 on:
   push:
@@ -67,3 +67,11 @@ jobs:
             --type external \
             --target-port 8000 \
             --transport auto
+
+      - name: Show Container App URL
+        run: |
+          az containerapp show \
+            --name "$CONTAINER_APP" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "properties.configuration.ingress.fqdn" \
+            --output tsv
