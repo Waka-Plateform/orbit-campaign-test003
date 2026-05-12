@@ -14,6 +14,8 @@ env:
   LOCATION: francecentral
   RESOURCE_GROUP: rg-orbit-campaign-test003
   CONTAINER_APP: orbit-campaign-test003
+  MANAGED_IDENTITY: id-orbit-campaign-test003
+  KEY_VAULT: kv-orbit-camp-test003
   ACR_NAME: crorbitplatform
   ACR_LOGIN_SERVER: crorbitplatform.azurecr.io
   IMAGE_NAME: orbit-campaign-test003
@@ -38,6 +40,27 @@ jobs:
           az group show --name "$RESOURCE_GROUP"
           az acr show --name "$ACR_NAME" --resource-group "$PLATFORM_RESOURCE_GROUP"
           az containerapp env show --name "$CAE_NAME" --resource-group "$PLATFORM_RESOURCE_GROUP"
+          az identity show --name "$MANAGED_IDENTITY" --resource-group "$RESOURCE_GROUP"
+          az keyvault show --name "$KEY_VAULT" --resource-group "$RESOURCE_GROUP"
+
+      - name: Ensure Key Vault RBAC for campaign managed identity
+        run: |
+          MI_PRINCIPAL_ID=$(az identity show \
+            --name "$MANAGED_IDENTITY" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query principalId \
+            --output tsv)
+          if [ -z "$MI_PRINCIPAL_ID" ]; then
+            echo "Managed identity principalId is empty"
+            exit 1
+          fi
+          az deployment group create \
+            --resource-group "$RESOURCE_GROUP" \
+            --template-file infra/keyvault.bicep \
+            --parameters keyVaultName="$KEY_VAULT" \
+                         managedIdentityPrincipalId="$MI_PRINCIPAL_ID"
+          echo "Waiting for Key Vault RBAC propagation"
+          sleep 90
 
       - name: Build and push image with ACR
         run: |
