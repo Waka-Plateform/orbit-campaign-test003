@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ campaign_name }} — Console Orbit</title>
+  <link rel="stylesheet" href="/static/console/skeleton.css">
+  <link rel="stylesheet" href="/static/console/components.css">
+  <link rel="stylesheet" href="/static/console/theme.css">
+</head>
+<body data-section="{{ section }}">
+  <aside class="orbit-sidebar">
+    <a href="/console/main">Main</a>
+    <a href="/console/base">Base</a>
+    <a href="/console/plan">Plan</a>
+    <a href="/console/sources">Sources</a>
+    <a href="/console/channels">Channels</a>
+    <a href="/console/dashboard">Dashboard</a>
+    <a href="/console/inbox">Inbox</a>
+  </aside>
+  <main class="orbit-main">
+    {% block content %}{% endblock %}
+  </main>
+  <script src="/static/console/skeleton.js"></script>
+  <script src="/static/console/sections/{{ section }}.js"></script>
+</body>
+</html>
