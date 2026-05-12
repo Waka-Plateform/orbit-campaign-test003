@@ -1,1 +1,8 @@
-// Filled by Coder Frontend phase 4.
+(function(){
+const root=document.getElementById('console-base'); if(!root) return;
+const tables=['contacts','step_output','events','inbox','audit_log','bounces','optout','conversions'];let table='contacts',page=1;
+const sel=document.getElementById('base-table');sel.innerHTML=tables.map(t=>`<option>${t}</option>`).join('');
+function cell(v){if(v===null||v===undefined)return '—'; if(typeof v==='object')return JSON.stringify(v); return String(v)}
+async function load(){try{table=sel.value;const q=document.getElementById('base-query').value;const schema=await OrbitConsole.fetchJson(`/api/console/base/${table}/schema`);document.getElementById('base-schema').textContent=(schema.fields||[]).map(f=>`${f.field}:${f.type}`).join(' · ');const d=await OrbitConsole.fetchJson(`/api/console/base/${table}?page=${page}&per_page=25&q=${encodeURIComponent(q)}`);const fields=(schema.fields||[]).filter(f=>f.default_visible).map(f=>f.field);document.querySelector('#base-table-view thead').innerHTML='<tr>'+fields.map(f=>`<th>${f}</th>`).join('')+'</tr>';document.querySelector('#base-table-view tbody').innerHTML=(d.rows||[]).map(r=>'<tr>'+fields.map(f=>`<td>${cell(r[f])}</td>`).join('')+'</tr>').join('')||`<tr><td colspan="${fields.length||1}">Aucune ligne.</td></tr>`;document.getElementById('base-pager').textContent=`${d.table} · page ${d.page} · total ${d.total}`;}catch(e){root.insertAdjacentHTML('beforeend',`<div class="orbit-error">${e.message}</div>`);}}
+sel.addEventListener('change',()=>{page=1;load()});document.getElementById('base-refresh').addEventListener('click',load);document.getElementById('base-query').addEventListener('keydown',e=>{if(e.key==='Enter')load()});load();
+})();

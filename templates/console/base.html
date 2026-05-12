@@ -1,1 +1,8 @@
-{% extends "console/_shell.html" %}{% block content %}<section id="console-base" data-api="/api/console/base/contacts"></section>{% endblock %}
+{% extends "console/_shell.html" %}
+{% block content %}
+<section id="console-base" class="orbit-section">
+  <div class="orbit-hero"><p class="orbit-eyebrow">Base campagne</p><h1>Données persistées</h1><p>Contacts, sorties de steps, événements, inbox, audit, bounces, opt-out et conversions.</p></div>
+  <div class="orbit-toolbar"><select id="base-table"></select><input id="base-query" placeholder="Recherche"><button id="base-refresh">Actualiser</button></div>
+  <article class="orbit-card"><div id="base-schema" class="orbit-muted">Schéma…</div><div class="orbit-table-wrap"><table id="base-table-view"><thead></thead><tbody></tbody></table></div><div id="base-pager" class="orbit-pager"></div></article>
+</section>
+{% endblock %}

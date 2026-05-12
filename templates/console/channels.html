@@ -1,1 +1,8 @@
-{% extends "console/_shell.html" %}{% block content %}<section id="console-channels" data-api="/api/console/channels"></section>{% endblock %}
+{% extends "console/_shell.html" %}
+{% block content %}
+<section id="console-channels" class="orbit-section" data-api="/api/console/channels">
+  <div class="orbit-hero"><p class="orbit-eyebrow">Canaux</p><h1>Configuration d’envoi</h1><p>État des canaux actifs et sélection des ressources fournisseur.</p></div>
+  <div id="channels-summary" class="orbit-grid orbit-grid-4"></div>
+  <div id="channels-manage" class="orbit-grid orbit-grid-2"></div>
+</section>
+{% endblock %}

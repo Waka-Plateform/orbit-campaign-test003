@@ -1,1 +1,7 @@
-{% extends "console/_shell.html" %}{% block content %}<section id="console-sources" data-api="/api/console/sources"></section>{% endblock %}
+{% extends "console/_shell.html" %}
+{% block content %}
+<section id="console-sources" class="orbit-section" data-api="/api/console/sources">
+  <div class="orbit-hero"><p class="orbit-eyebrow">Sources</p><h1>Artefacts campagne</h1><p>Templates email/SMS, prompts et scripts liés au flow runtime.</p></div>
+  <div class="orbit-grid orbit-grid-2"><article class="orbit-card"><h2>Liste</h2><div id="sources-list" class="orbit-list">Chargement…</div></article><article class="orbit-card"><h2>Détail</h2><pre id="sources-detail">Sélectionne une source.</pre></article></div>
+</section>
+{% endblock %}

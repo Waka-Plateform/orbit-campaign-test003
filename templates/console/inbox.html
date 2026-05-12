@@ -1,1 +1,8 @@
-{% extends "console/_shell.html" %}{% block content %}<section id="console-inbox" data-api="/api/console/inbox/email"></section>{% endblock %}
+{% extends "console/_shell.html" %}
+{% block content %}
+<section id="console-inbox" class="orbit-section">
+  <div class="orbit-hero"><p class="orbit-eyebrow">Inbox</p><h1>Messages entrants</h1><p>Réponses email, SMS, WhatsApp et agents Waka centralisées.</p></div>
+  <div class="orbit-toolbar"><select id="inbox-channel"><option>email</option><option>sms</option><option>whatsapp</option><option>voice</option></select><button id="inbox-refresh">Actualiser</button></div>
+  <article class="orbit-card"><div id="inbox-list" class="orbit-list">Chargement…</div></article>
+</section>
+{% endblock %}

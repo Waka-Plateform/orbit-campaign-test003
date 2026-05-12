@@ -1,1 +1,8 @@
-{% extends "console/_shell.html" %}{% block content %}<section id="console-plan" data-api="/api/console/plan"></section>{% endblock %}
+{% extends "console/_shell.html" %}
+{% block content %}
+<section id="console-plan" class="orbit-section" data-api="/api/console/plan">
+  <div class="orbit-hero"><p class="orbit-eyebrow">Planification</p><h1>Cycle de vie campagne</h1><p>Horaires d’envoi, fréquence, throttling et commandes runtime.</p></div>
+  <div class="orbit-actions"><button data-plan-action="start">Start</button><button data-plan-action="pause">Pause</button><button data-plan-action="resume">Resume</button><button data-plan-action="stop">Stop</button><button data-plan-action="tick">Tick debug</button></div>
+  <div class="orbit-grid orbit-grid-2"><article class="orbit-card"><h2>Schedule</h2><pre id="plan-json">Chargement…</pre></article><article class="orbit-card"><h2>Runtime</h2><div id="plan-runtime" class="orbit-list">Chargement…</div></article></div>
+</section>
+{% endblock %}

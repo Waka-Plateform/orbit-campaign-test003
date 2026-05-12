@@ -1,1 +1,10 @@
-// Filled by Coder Frontend phase 4.
+(function(){
+const root=document.getElementById('console-dashboard'); if(!root) return;
+const fmt=v=>v===null||v===undefined?'—':(typeof v==='number'?new Intl.NumberFormat('fr-FR').format(v):String(v));
+const pct=v=>typeof v==='number'?new Intl.NumberFormat('fr-FR',{style:'percent',maximumFractionDigits:1}).format(v):fmt(v);
+const metricValue=m=>m?.format==='percentage'?pct(m.value):m?.format==='currency'?new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(m.value||0):fmt(m?.value??m?.elapsed_seconds);
+const kpi=(label,value)=>`<div class="orbit-kpi"><span class="orbit-muted">${label}</span><strong>${value}</strong></div>`;
+const row=(a,b)=>`<div class="orbit-row"><span>${a}</span><strong>${b}</strong></div>`;
+async function load(){try{const d=await OrbitConsole.fetchJson(root.dataset.api);const op=d.operational||{};document.getElementById('dashboard-operational').innerHTML=Object.entries(op).slice(0,8).map(([k,m])=>kpi(k.replaceAll('_',' '),metricValue(m))).join('');document.getElementById('dashboard-business').innerHTML=(d.business||[]).map(m=>row(m.label||m.id,`${metricValue(m)} ${m.target!==undefined?' / cible '+pct(m.target):''}`)).join('')||'<p class="orbit-muted">Aucun KPI business.</p>';document.getElementById('dashboard-funnel').innerHTML=(d.timeseries?.funnel||[]).map(f=>row(f.stage,fmt(f.value))).join('')||'<p class="orbit-muted">Funnel vide.</p>';const activity=d.timeseries?.activity_by_day;document.getElementById('dashboard-activity').innerHTML=activity?`<strong>${(activity.labels||[]).join(' → ')}</strong><pre>${JSON.stringify(activity.series||[],null,2)}</pre>`:'Aucune série.';document.getElementById('dashboard-audience').innerHTML=(d.breakdowns?.by_audience||[]).map(a=>row(a.name||a.audience_id,JSON.stringify(a.metrics||{}))).join('')||'<p class="orbit-muted">Aucun breakdown audience.</p>';document.getElementById('dashboard-step').innerHTML=(d.breakdowns?.by_step||[]).map(s=>row(s.name||s.step_id,JSON.stringify(s.metrics||{}))).join('')||'<p class="orbit-muted">Aucun breakdown step.</p>';}catch(e){root.insertAdjacentHTML('beforeend',`<div class="orbit-error">${e.message}</div>`);}}
+load();
+})();

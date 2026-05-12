@@ -1,1 +1,20 @@
-{% extends "console/_shell.html" %}{% block content %}<section id="console-dashboard" data-api="/api/console/dashboard"></section>{% endblock %}
+{% extends "console/_shell.html" %}
+{% block content %}
+<section id="console-dashboard" class="orbit-section" data-api="/api/console/dashboard">
+  <div class="orbit-hero">
+    <p class="orbit-eyebrow">Dashboard live</p>
+    <h1>Performance campagne</h1>
+    <p>Ouverture cumulée email + SMS, comparaison par canal et suivi day-over-day.</p>
+  </div>
+  <div class="orbit-grid orbit-grid-4" id="dashboard-operational"></div>
+  <div class="orbit-grid orbit-grid-2">
+    <article class="orbit-card"><h2>KPIs business</h2><div id="dashboard-business" class="orbit-list">Chargement…</div></article>
+    <article class="orbit-card"><h2>Funnel</h2><div id="dashboard-funnel" class="orbit-list">Chargement…</div></article>
+  </div>
+  <article class="orbit-card"><h2>Activité day-over-day</h2><div id="dashboard-activity" class="orbit-chart-placeholder">Chargement…</div></article>
+  <div class="orbit-grid orbit-grid-2">
+    <article class="orbit-card"><h2>Par audience</h2><div id="dashboard-audience" class="orbit-list">Chargement…</div></article>
+    <article class="orbit-card"><h2>Par étape</h2><div id="dashboard-step" class="orbit-list">Chargement…</div></article>
+  </div>
+</section>
+{% endblock %}

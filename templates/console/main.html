@@ -1,1 +1,16 @@
-{% extends "console/_shell.html" %}{% block content %}<section id="console-main" data-api="/api/console/main"></section>{% endblock %}
+{% extends "console/_shell.html" %}
+{% block content %}
+<section id="console-main" class="orbit-section" data-api="/api/console/main">
+  <div class="orbit-hero">
+    <p class="orbit-eyebrow">Console campagne</p>
+    <h1>test003</h1>
+    <p>Chargement des indicateurs opérationnels et des ressources Azure…</p>
+  </div>
+  <div id="main-kpis" class="orbit-grid orbit-grid-4"></div>
+  <div class="orbit-grid orbit-grid-2">
+    <article class="orbit-card"><h2>Audiences</h2><div id="main-audiences" class="orbit-list">Chargement…</div></article>
+    <article class="orbit-card"><h2>Volume par canal</h2><div id="main-channels" class="orbit-list">Chargement…</div></article>
+  </div>
+  <article class="orbit-card"><h2>Ressources Azure</h2><div id="main-resources" class="orbit-list">Chargement…</div></article>
+</section>
+{% endblock %}
