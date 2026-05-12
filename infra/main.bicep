@@ -48,12 +48,21 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
         }
       ]
       secrets: [
-        { name: 'acs-email-connection-string', keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/acs-email-connection-string', identity: identity.id }
-        { name: 'acs-sms-connection-string', keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/acs-sms-connection-string', identity: identity.id }
-        { name: 'compeak-token', keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/compeak-token', identity: identity.id }
-        { name: 'tracking-hmac-key', keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/tracking-hmac-key', identity: identity.id }
-        { name: 'foundry-endpoint', keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/foundry-endpoint', identity: identity.id }
-        { name: 'foundry-api-key', keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/foundry-api-key', identity: identity.id }
+        {
+          name: 'acs-email-connection-string'
+          keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/acs-email-connection-string'
+          identity: identity.id
+        }
+        {
+          name: 'acs-sms-connection-string'
+          keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/acs-sms-connection-string'
+          identity: identity.id
+        }
+        {
+          name: 'tracking-hmac-key'
+          keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/tracking-hmac-key'
+          identity: identity.id
+        }
       ]
     }
     template: {
