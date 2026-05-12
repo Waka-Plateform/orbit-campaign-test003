@@ -7,6 +7,7 @@ param imageName string
 param userAssignedIdentityName string = 'id-orbit-campaign-test003'
 param keyVaultName string = 'kv-orbit-camp-test003'
 param storageAccountName string = 'stcamptest003'
+param acsEndpoint string = 'https://orbit-acs.communication.azure.com/'
 
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: userAssignedIdentityName
@@ -49,16 +50,6 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
       ]
       secrets: [
         {
-          name: 'acs-email-connection-string'
-          keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/acs-email-connection-string'
-          identity: identity.id
-        }
-        {
-          name: 'acs-sms-connection-string'
-          keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/acs-sms-connection-string'
-          identity: identity.id
-        }
-        {
           name: 'tracking-hmac-key'
           keyVaultUrl: 'https://${keyVaultName}.vault.azure.net/secrets/tracking-hmac-key'
           identity: identity.id
@@ -74,6 +65,8 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'ENVIRONMENT', value: 'production' }
             { name: 'CAMPAIGN_ID', value: '4451dffd-e063-4cec-9105-d9ba3efde49b' }
             { name: 'PUBLIC_BASE_URL', value: 'https://${containerAppName}.orangepond-00000000.francecentral.azurecontainerapps.io' }
+            { name: 'ACS_ENDPOINT', value: acsEndpoint }
+            { name: 'TRACKING_HMAC_KEY', secretRef: 'tracking-hmac-key' }
           ]
           probes: [
             { type: 'Liveness', httpGet: { path: '/health', port: 8000 }, initialDelaySeconds: 30, periodSeconds: 30 }

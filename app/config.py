@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     table_conversions: str = "conversions"
     table_state: str = "campaignstate"
 
+    acs_endpoint: str = Field(default="https://orbit-acs.communication.azure.com/", alias="ACS_ENDPOINT")
     acs_email_connection_string_secret: str = "acs-email-connection-string"
     acs_sms_connection_string_secret: str = "acs-sms-connection-string"
     compeak_token_secret: str = "compeak-token"
@@ -94,36 +95,9 @@ def get_settings() -> Settings:
 
 CAMPAIGN_BRIEF: dict[str, Any] = {
     "objective": "Informer les 3 484 contacts des nouvelles conditions Waka via email template puis SMS de relance aux non-ouvreurs après 72h, avec liens vers les agents texte, voix et avatar pour les questions, et atteindre 90 % d’ouverture cumulée email + SMS.",
-    "flow_graph": {
-        "version": 1,
-        "trigger": {"id": "trg", "kind": "manual", "config": {}},
-        "nodes": [
-            {"id": "A", "type": "send_email_template", "label": "Information nouvelles conditions Waka", "audience_ref": "aud_all_prospects", "config": {"legal_url": "https://www.wakaorbit.com/legal", "question_agent_links": ["web_text_session:T", "web_voice_session:V", "web_avatar_session:AV"]}},
-            {"id": "W1", "type": "wait", "label": "Attente 72h après email", "config": {"duration": "PT72H"}},
-            {"id": "X1", "type": "condition", "label": "Email ouvert ?", "config": {"expr": "event.email_opened == true", "window": "PT72H", "action_ref": "A"}},
-            {"id": "END_OPEN", "type": "end", "label": "Fin — email ouvert"},
-            {"id": "B", "type": "send_sms_template", "label": "Relance SMS non-ouvreurs", "audience_ref": "aud_email_non_openers_72h", "config": {"legal_url": "https://www.wakaorbit.com/legal", "question_agent_links": ["web_text_session:T", "web_voice_session:V", "web_avatar_session:AV"]}},
-            {"id": "W2", "type": "wait", "label": "Mesure SMS à 72h", "config": {"duration": "PT72H"}},
-            {"id": "END_SMS", "type": "end", "label": "Fin — SMS mesuré"},
-            {"id": "T", "type": "web_text_session", "label": "Questions — agent texte", "agent_id": "11be752f-8ee8-4080-ade6-8a0bc4bc2636", "audience_ref": "aud_all_prospects"},
-            {"id": "V", "type": "web_voice_session", "label": "Questions — agent voix web", "agent_id": "b156d452-eafd-46f4-907f-c51e32e72ccc", "audience_ref": "aud_all_prospects"},
-            {"id": "AV", "type": "web_avatar_session", "label": "Questions — agent avatar", "agent_id": "277098c3-aec4-46a9-a445-9beaa1835c2c", "audience_ref": "aud_all_prospects"},
-        ],
-        "edges": [
-            {"from": "trg", "to": "A"}, {"from": "A", "to": "W1"}, {"from": "W1", "to": "X1"},
-            {"from": "X1", "to": "END_OPEN", "label": "yes"}, {"from": "X1", "to": "B", "label": "no"},
-            {"from": "B", "to": "W2"}, {"from": "W2", "to": "END_SMS"},
-        ],
-    },
-    "audiences": [
-        {"id": "aud_all_prospects", "label": "Toute la base prospects", "estimated_count": 3484, "filters": []},
-        {"id": "aud_email_non_openers_72h", "label": "Non-ouvreurs email après 72h", "estimated_count": None, "derived_from": "aud_all_prospects"},
-    ],
-    "success_metrics": [
-        {"id": "cumulative_open_rate", "label": "Ouverture cumulée email + SMS", "description": "% des contacts ayant ouvert l’email A ou lu/ouvert le SMS B dans la fenêtre de mesure.", "kind": "business", "format": "percentage", "target": 0.9, "window": {"value": 6, "unit": "day"}, "viz": "gauge"},
-        {"id": "open_rate_email_vs_sms", "label": "Comparaison ouverture email vs SMS", "description": "Deux barres comparant le taux d’ouverture email A et le taux de lecture/ouverture SMS B mesuré 72h après envoi SMS.", "kind": "business", "format": "percentage", "target": None, "window": {"value": 72, "unit": "hour"}, "viz": "breakdown_bar", "breakdown_by": "channel"},
-        {"id": "open_rate_day_over_day", "label": "Progression des ouvertures day-over-day", "description": "Évolution quotidienne du taux d’ouverture cumulée email + SMS.", "kind": "business", "format": "percentage", "target": 0.9, "window": {"value": 6, "unit": "day"}, "viz": "timeseries"},
-    ],
+    "flow_graph": {"version": 1, "trigger": {"id": "trg", "kind": "manual", "config": {}}, "nodes": [], "edges": []},
+    "audiences": [{"id": "aud_all_prospects", "label": "Toute la base prospects", "estimated_count": 3484, "filters": []}],
+    "success_metrics": [{"id": "cumulative_open_rate", "label": "Ouverture cumulée email + SMS", "kind": "business", "format": "percentage", "target": 0.9, "window": {"value": 6, "unit": "day"}, "viz": "gauge"}],
 }
 
 ARTIFACTS: dict[str, dict[str, Any]] = {

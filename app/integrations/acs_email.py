@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from azure.communication.email import EmailClient
+from azure.identity import DefaultAzureCredential
 
 from app.config import SecretProvider, Settings
 
@@ -8,7 +9,9 @@ from app.config import SecretProvider, Settings
 class AcsEmailClient:
     def __init__(self, settings: Settings, secrets: SecretProvider):
         self.settings = settings
-        self.client = EmailClient.from_connection_string(secrets.get(settings.acs_email_connection_string_secret))
+        self._secrets = secrets
+        credential = DefaultAzureCredential(exclude_interactive_browser_credential=True)
+        self.client = EmailClient(endpoint=settings.acs_endpoint, credential=credential)
 
     def send_html(self, to_email: str, subject: str, html: str, correlation_id: str) -> str:
         message = {
