@@ -8,6 +8,9 @@ param userAssignedIdentityName string = 'id-orbit-campaign-test003'
 param keyVaultName string = 'kv-orbit-camp-test003'
 param storageAccountName string = 'stcamptest003'
 param acsEndpoint string = 'https://orbit-acs.communication.azure.com/'
+param campaignId string = '4451dffd-e063-4cec-9105-d9ba3efde49b'
+param campaignSlug string = 'test003'
+param publicBaseUrl string = 'https://orbit-campaign-test003.wonderfulglacier-5170fd33.francecentral.azurecontainerapps.io'
 
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: userAssignedIdentityName
@@ -63,9 +66,14 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
           image: imageName
           env: [
             { name: 'ENVIRONMENT', value: 'production' }
-            { name: 'CAMPAIGN_ID', value: '4451dffd-e063-4cec-9105-d9ba3efde49b' }
-            { name: 'PUBLIC_BASE_URL', value: 'https://${containerAppName}.orangepond-00000000.francecentral.azurecontainerapps.io' }
+            { name: 'CAMPAIGN_ID', value: campaignId }
+            { name: 'CAMPAIGN_SLUG', value: campaignSlug }
+            { name: 'PUBLIC_BASE_URL', value: publicBaseUrl }
+            { name: 'TRACKING_BASE_URL', value: publicBaseUrl }
             { name: 'ACS_ENDPOINT', value: acsEndpoint }
+            { name: 'STORAGE_ACCOUNT', value: storageAccountName }
+            { name: 'KEY_VAULT_URI', value: 'https://${keyVaultName}.vault.azure.net/' }
+            { name: 'AZURE_CLIENT_ID', value: identity.properties.clientId }
             { name: 'TRACKING_HMAC_KEY', secretRef: 'tracking-hmac-key' }
           ]
           probes: [
