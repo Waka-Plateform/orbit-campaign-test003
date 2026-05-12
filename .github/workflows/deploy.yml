@@ -1,4 +1,5 @@
 name: deploy
+# RBAC refresh trigger after Key Vault Secrets User assignment for id-orbit-campaign-test003
 
 on:
   push:
