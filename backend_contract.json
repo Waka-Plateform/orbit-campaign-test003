@@ -1,1 +1,124 @@
-{"version":1,"campaign_id":"4451dffd-e063-4cec-9105-d9ba3efde49b","slug":"test003","endpoints":[{"section":"console","method":"GET","path":"/console"},{"section":"console","method":"GET","path":"/console/{section}"},{"section":"main","method":"GET","path":"/api/console/main","response_schema":"main_v1"},{"section":"main_files","method":"GET","path":"/api/console/main/files"},{"section":"main_files_content","method":"GET","path":"/api/console/main/files/content?path={path}"},{"section":"base","method":"GET","path":"/api/console/base/{table}","tables":["contacts","step_output","events","inbox","audit_log","bounces","optout","conversions"]},{"section":"base_schema","method":"GET","path":"/api/console/base/{table}/schema"},{"section":"plan","method":"GET","path":"/api/console/plan"},{"section":"plan","method":"POST","path":"/api/console/plan"},{"section":"plan_start","method":"POST","path":"/api/console/plan/start"},{"section":"plan_pause","method":"POST","path":"/api/console/plan/pause"},{"section":"plan_resume","method":"POST","path":"/api/console/plan/resume"},{"section":"plan_stop","method":"POST","path":"/api/console/plan/stop"},{"section":"plan_tick","method":"POST","path":"/api/console/plan/tick"},{"section":"sources","method":"GET","path":"/api/console/sources"},{"section":"sources_detail","method":"GET","path":"/api/console/sources/{id}"},{"section":"sources_patch","method":"PATCH","path":"/api/console/sources/{id}"},{"section":"sources_history","method":"GET","path":"/api/console/sources/{id}/history"},{"section":"sources_test","method":"POST","path":"/api/console/sources/{id}/test"},{"section":"channels","method":"GET","path":"/api/console/channels"},{"section":"dashboard","method":"GET","path":"/api/console/dashboard?window={from:to}&group_by={day|hour}"},{"section":"inbox","method":"GET","path":"/api/console/inbox/{channel}"},{"section":"inbox_reply","method":"POST","path":"/api/console/inbox/{msg_id}/reply"},{"section":"flow_svg","method":"GET","path":"/api/console/flow.svg?mode={design|runtime}"},{"section":"health","method":"GET","path":"/health"},{"section":"tracking_open","method":"GET","path":"/track/open/{step_id}"},{"section":"tracking_click","method":"GET","path":"/track/click/{step_id}"},{"section":"unsubscribe","method":"GET","path":"/unsubscribe/{contact_id}"},{"section":"events","method":"GET","path":"/events"}],"sse_streams":[{"event":"inbox.email.new","path":"/events"},{"event":"inbox.sms.new","path":"/events"}],"static_assets_expected":["templates/console/_shell.html","templates/console/main.html","templates/console/base.html","templates/console/plan.html","templates/console/sources.html","templates/console/channels.html","templates/console/dashboard.html","templates/console/inbox.html","static/console/skeleton.css","static/console/components.css","static/console/theme.css","static/console/skeleton.js","static/console/sections/main.js","static/console/sections/base.js","static/console/sections/plan.js","static/console/sections/sources.js","static/console/sections/channels.js","static/console/sections/dashboard.js","static/console/sections/inbox.js"],"ui_provided_variables":{"email":[{"id":"email_subscription_id","type":"string","label":"Souscription Azure"},{"id":"email_resource_group_name","type":"string"},{"id":"email_communication_service_id","type":"string"},{"id":"email_domain","type":"string"},{"id":"email_sender_username","type":"string"},{"id":"email_display_name","type":"string","optional":true},{"id":"email_reply_to","type":"string","optional":true}],"sms":[{"id":"sms_subscription_id","type":"string"},{"id":"sms_resource_group_name","type":"string"},{"id":"sms_communication_service_id","type":"string"},{"id":"sms_sender","type":"string"}],"whatsapp":[{"id":"whatsapp_sender","type":"string","optional":true}],"voice":[{"id":"compeak_token","type":"secret_ref"}],"agents_waka":[{"id":"text_agent_id","type":"string"},{"id":"voice_agent_id","type":"string"},{"id":"avatar_agent_id","type":"string"}]},"success_metrics":[{"id":"cumulative_open_rate","label":"Ouverture cumulée email + SMS","kind":"business","format":"percentage","target":0.9,"viz":"gauge"},{"id":"open_rate_email_vs_sms","label":"Comparaison ouverture email vs SMS","kind":"business","format":"percentage","viz":"breakdown_bar","breakdown_by":"channel"},{"id":"open_rate_day_over_day","label":"Progression des ouvertures day-over-day","kind":"business","format":"percentage","target":0.9,"viz":"timeseries"}],"active_channels":["email","sms","web_text","web_voice","web_avatar"]}
+{
+  "version": 2,
+  "campaign_id": "4451dffd-e063-4cec-9105-d9ba3efde49b",
+  "slug": "test003",
+  "endpoints": [
+    {"section":"console","method":"GET","path":"/console"},
+    {"section":"console","method":"GET","path":"/console/{section}"},
+    {"section":"main","method":"GET","path":"/api/console/main","response_schema":"main_v1"},
+    {"section":"main_files","method":"GET","path":"/api/console/main/files"},
+    {"section":"main_files_content","method":"GET","path":"/api/console/main/files/content?path={path}"},
+    {"section":"base","method":"GET","path":"/api/console/base/{table}","tables":["contacts","step_output","events","inbox","audit_log","bounces","optout","conversions"]},
+    {"section":"base_schema","method":"GET","path":"/api/console/base/{table}/schema"},
+    {"section":"plan","method":"GET","path":"/api/console/plan"},
+    {"section":"plan","method":"POST","path":"/api/console/plan"},
+    {"section":"plan_start","method":"POST","path":"/api/console/plan/start"},
+    {"section":"plan_pause","method":"POST","path":"/api/console/plan/pause"},
+    {"section":"plan_resume","method":"POST","path":"/api/console/plan/resume"},
+    {"section":"plan_stop","method":"POST","path":"/api/console/plan/stop"},
+    {"section":"plan_tick","method":"POST","path":"/api/console/plan/tick"},
+    {"section":"sources","method":"GET","path":"/api/console/sources"},
+    {"section":"sources_detail","method":"GET","path":"/api/console/sources/{id}"},
+    {"section":"sources_patch","method":"PATCH","path":"/api/console/sources/{id}"},
+    {"section":"sources_history","method":"GET","path":"/api/console/sources/{id}/history"},
+    {"section":"sources_test","method":"POST","path":"/api/console/sources/{id}/test"},
+    {"section":"channels","method":"GET","path":"/api/console/channels"},
+    {"section":"channels_email_options","method":"GET","path":"/api/channels/email/options","response_schema":"channel_options_v1"},
+    {"section":"channels_email_select","method":"POST","path":"/api/channels/email/select","request_schema":"channel_selection_email_v1","response_schema":"channel_select_result_v1"},
+    {"section":"channels_sms_options","method":"GET","path":"/api/channels/sms/options","response_schema":"channel_options_v1"},
+    {"section":"channels_sms_select","method":"POST","path":"/api/channels/sms/select","request_schema":"channel_selection_sms_v1","response_schema":"channel_select_result_v1"},
+    {"section":"channels_whatsapp_options","method":"GET","path":"/api/channels/whatsapp/options","response_schema":"channel_options_v1"},
+    {"section":"channels_whatsapp_select","method":"POST","path":"/api/channels/whatsapp/select","request_schema":"channel_selection_whatsapp_v1","response_schema":"channel_select_result_v1"},
+    {"section":"channels_voice_options","method":"GET","path":"/api/channels/voice/options","response_schema":"channel_options_v1"},
+    {"section":"channels_voice_select","method":"POST","path":"/api/channels/voice/select","request_schema":"channel_selection_voice_v1","response_schema":"channel_select_result_v1"},
+    {"section":"channels_agents_waka_options","method":"GET","path":"/api/channels/waka-agents/options","response_schema":"channel_options_v1"},
+    {"section":"channels_agents_waka_select","method":"POST","path":"/api/channels/waka-agents/select","request_schema":"channel_selection_agents_waka_v1","response_schema":"channel_select_result_v1"},
+    {"section":"dashboard","method":"GET","path":"/api/console/dashboard?window={from:to}&group_by={day|hour}"},
+    {"section":"inbox","method":"GET","path":"/api/console/inbox/{channel}"},
+    {"section":"inbox_reply","method":"POST","path":"/api/console/inbox/{msg_id}/reply"},
+    {"section":"flow_svg","method":"GET","path":"/api/console/flow.svg?mode={design|runtime}"},
+    {"section":"health","method":"GET","path":"/health"},
+    {"section":"tracking_open","method":"GET","path":"/track/open/{step_id}"},
+    {"section":"tracking_click","method":"GET","path":"/track/click/{step_id}"},
+    {"section":"unsubscribe","method":"GET","path":"/unsubscribe/{contact_id}"},
+    {"section":"events","method":"GET","path":"/events"}
+  ],
+  "schemas": {
+    "channel_options_v1": {
+      "channel": "string",
+      "channel_key": "string",
+      "enabled": "boolean",
+      "provider": "string",
+      "required_variables": ["string"],
+      "optional_variables": ["string"],
+      "current": "object",
+      "options": "object"
+    },
+    "channel_select_result_v1": {
+      "ok": "boolean",
+      "channel": "string",
+      "channel_key": "string",
+      "selected": "object",
+      "updated_at": "iso_datetime"
+    }
+  },
+  "sse_streams": [
+    {"event":"inbox.email.new","path":"/events"},
+    {"event":"inbox.sms.new","path":"/events"}
+  ],
+  "static_assets_expected": [
+    "templates/console/_shell.html",
+    "templates/console/main.html",
+    "templates/console/base.html",
+    "templates/console/plan.html",
+    "templates/console/sources.html",
+    "templates/console/channels.html",
+    "templates/console/dashboard.html",
+    "templates/console/inbox.html",
+    "static/console/skeleton.css",
+    "static/console/components.css",
+    "static/console/theme.css",
+    "static/console/skeleton.js",
+    "static/console/sections/main.js",
+    "static/console/sections/base.js",
+    "static/console/sections/plan.js",
+    "static/console/sections/sources.js",
+    "static/console/sections/channels.js",
+    "static/console/sections/dashboard.js",
+    "static/console/sections/inbox.js"
+  ],
+  "ui_provided_variables": {
+    "email": [
+      {"id":"email_subscription_id","type":"string","label":"Souscription Azure"},
+      {"id":"email_resource_group_name","type":"string"},
+      {"id":"email_communication_service_id","type":"string"},
+      {"id":"email_domain","type":"string"},
+      {"id":"email_sender_username","type":"string"},
+      {"id":"email_display_name","type":"string","optional":true},
+      {"id":"email_reply_to","type":"string","optional":true}
+    ],
+    "sms": [
+      {"id":"sms_subscription_id","type":"string"},
+      {"id":"sms_resource_group_name","type":"string"},
+      {"id":"sms_communication_service_id","type":"string"},
+      {"id":"sms_sender","type":"string"}
+    ],
+    "whatsapp": [
+      {"id":"whatsapp_sender","type":"string","optional":true}
+    ],
+    "voice": [
+      {"id":"compeak_token","type":"secret_ref"}
+    ],
+    "agents_waka": [
+      {"id":"text_agent_id","type":"string"},
+      {"id":"voice_agent_id","type":"string"},
+      {"id":"avatar_agent_id","type":"string"}
+    ]
+  },
+  "success_metrics": [
+    {"id":"cumulative_open_rate","label":"Ouverture cumulée email + SMS","kind":"business","format":"percentage","target":0.9,"viz":"gauge"},
+    {"id":"open_rate_email_vs_sms","label":"Comparaison ouverture email vs SMS","kind":"business","format":"percentage","viz":"breakdown_bar","breakdown_by":"channel"},
+    {"id":"open_rate_day_over_day","label":"Progression des ouvertures day-over-day","kind":"business","format":"percentage","target":0.9,"viz":"timeseries"}
+  ],
+  "active_channels": ["email","sms","web_text","web_voice","web_avatar"]
+}

@@ -1,58 +1,104 @@
 from __future__ import annotations
 
+from azure.core.exceptions import ResourceNotFoundError
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, ContentSettings
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import PlainTextResponse
 
 from app.config import ARTIFACTS, Settings
-from app.deps import settings_dep
+from app.deps import console_actor, settings_dep, store_dep
+from app.storage.tables import TableStore, utc_now
 
 router = APIRouter(prefix="/api/console/sources", tags=["console-sources"])
 
 
 def blob_service(settings: Settings) -> BlobServiceClient:
-    return BlobServiceClient(account_url=f"https://{settings.storage_account_name}.blob.core.windows.net", credential=DefaultAzureCredential(exclude_interactive_browser_credential=True))
+    return BlobServiceClient(
+        account_url=f"https://{settings.storage_account_name}.blob.core.windows.net",
+        credential=DefaultAzureCredential(exclude_interactive_browser_credential=True),
+    )
+
+
+def source_meta(source_id: str) -> dict:
+    meta = ARTIFACTS.get(source_id)
+    if not meta:
+        raise HTTPException(status_code=404, detail="source not found")
+    return meta
+
+
+def public_source(source_id: str, meta: dict, include_content: bool = False, content: str | None = None) -> dict:
+    payload = {
+        "id": source_id,
+        "action_id": meta.get("action_id"),
+        "kind": meta.get("kind"),
+        "channel": meta.get("channel"),
+        "mode": meta.get("mode"),
+        "subject": meta.get("subject"),
+        "blob_path": meta.get("blob_path"),
+        "editable": True,
+        "content_type": "text/html" if meta.get("channel") == "email" else "text/plain",
+    }
+    if include_content:
+        payload["content"] = content or ""
+    return payload
 
 
 @router.get("")
 def list_sources() -> dict:
-    return {"items": [{"id": artifact_id, **meta} for artifact_id, meta in ARTIFACTS.items()]}
+    return {"items": [public_source(artifact_id, meta) for artifact_id, meta in ARTIFACTS.items()]}
 
 
-@router.get("/{source_id}")
-def get_source(source_id: str, settings: Settings = Depends(settings_dep)) -> dict:
-    meta = ARTIFACTS.get(source_id)
-    if not meta:
-        raise HTTPException(status_code=404, detail="source not found")
-    content = blob_service(settings).get_blob_client(settings.artifacts_container, meta["blob_path"]).download_blob().readall().decode("utf-8")
-    return {"id": source_id, **meta, "content": content}
+@router.get("/{id}")
+def get_source(id: str, settings: Settings = Depends(settings_dep)) -> dict:
+    meta = source_meta(id)
+    try:
+        content = blob_service(settings).get_blob_client(settings.artifacts_container, meta["blob_path"]).download_blob().readall().decode("utf-8")
+    except ResourceNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=f"source blob not found for {id}") from exc
+    return public_source(id, meta, include_content=True, content=content)
 
 
-@router.patch("/{source_id}")
-async def patch_source(source_id: str, request: Request, settings: Settings = Depends(settings_dep)) -> dict:
-    meta = ARTIFACTS.get(source_id)
-    if not meta:
-        raise HTTPException(status_code=404, detail="source not found")
+@router.patch("/{id}")
+async def patch_source(
+    id: str,
+    request: Request,
+    actor: str = Depends(console_actor),
+    settings: Settings = Depends(settings_dep),
+    store: TableStore = Depends(store_dep),
+) -> dict:
+    meta = source_meta(id)
     body = await request.json()
     content = str(body.get("content", ""))
     if not content:
         raise HTTPException(status_code=400, detail="content is required")
-    blob_service(settings).get_blob_client(settings.artifacts_container, meta["blob_path"]).upload_blob(content.encode("utf-8"), overwrite=True, content_settings=ContentSettings(content_type="text/html" if meta["channel"] == "email" else "text/plain"))
-    return {"ok": True, "id": source_id}
+    content_type = "text/html" if meta["channel"] == "email" else "text/plain"
+    blob_service(settings).get_blob_client(settings.artifacts_container, meta["blob_path"]).upload_blob(
+        content.encode("utf-8"),
+        overwrite=True,
+        content_settings=ContentSettings(content_type=content_type),
+    )
+    store.audit("source.patch", actor=actor, payload={"source_id": id, "blob_path": meta["blob_path"]})
+    return {"ok": True, "id": id, "updated_at": utc_now()}
 
 
-@router.get("/{source_id}/history")
-def history(source_id: str, settings: Settings = Depends(settings_dep)) -> dict:
-    meta = ARTIFACTS.get(source_id)
-    if not meta:
-        raise HTTPException(status_code=404, detail="source not found")
-    versions = blob_service(settings).get_container_client(settings.artifacts_container).list_blobs(name_starts_with=meta["blob_path"], include=["versions"])
-    return {"id": source_id, "versions": [{"name": v.name, "version_id": getattr(v, "version_id", None), "last_modified": str(v.last_modified)} for v in versions]}
+@router.get("/{id}/history")
+def history(id: str, settings: Settings = Depends(settings_dep)) -> dict:
+    meta = source_meta(id)
+    versions = blob_service(settings).get_container_client(settings.artifacts_container).list_blobs(
+        name_starts_with=meta["blob_path"],
+        include=["versions"],
+    )
+    return {
+        "id": id,
+        "versions": [
+            {"name": version.name, "version_id": getattr(version, "version_id", None), "last_modified": str(version.last_modified)}
+            for version in versions
+        ],
+    }
 
 
-@router.post("/{source_id}/test")
-def test_source(source_id: str) -> dict:
-    if source_id not in ARTIFACTS:
-        raise HTTPException(status_code=404, detail="source not found")
-    return {"ok": True, "source_id": source_id, "message": "test dispatch accepted for current user"}
+@router.post("/{id}/test")
+def test_source(id: str, actor: str = Depends(console_actor), store: TableStore = Depends(store_dep)) -> dict:
+    source_meta(id)
+    store.audit("source.test", actor=actor, payload={"source_id": id})
+    return {"ok": True, "id": id, "message": "test dispatch accepted for current user"}
