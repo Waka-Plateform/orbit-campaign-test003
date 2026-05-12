@@ -1,0 +1,63 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  LOCATION: francecentral
+  RESOURCE_GROUP: rg-orbit-campaign-test003
+  CONTAINER_APP: orbit-campaign-test003
+  ACR_NAME: crorbitplatform
+  ACR_LOGIN_SERVER: crorbitplatform.azurecr.io
+  IMAGE_NAME: orbit-campaign-test003
+  CAE_NAME: cae-orbit-platform
+  PLATFORM_RESOURCE_GROUP: rg-orbit-platform
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login using OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Verify Azure resources
+        run: |
+          az group show --name "$RESOURCE_GROUP"
+          az acr show --name "$ACR_NAME" --resource-group "$PLATFORM_RESOURCE_GROUP"
+          az containerapp env show --name "$CAE_NAME" --resource-group "$PLATFORM_RESOURCE_GROUP"
+
+      - name: Build and push image with ACR
+        run: |
+          az acr build --registry "$ACR_NAME" --image "$IMAGE_NAME:${{ github.sha }}" --file Dockerfile .
+
+      - name: Deploy infrastructure
+        run: |
+          az deployment group create \
+            --resource-group "$RESOURCE_GROUP" \
+            --template-file infra/main.bicep \
+            --parameters imageName="$ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}" \
+                         containerAppName="$CONTAINER_APP" \
+                         environmentName="$CAE_NAME" \
+                         environmentResourceGroup="$PLATFORM_RESOURCE_GROUP" \
+                         acrName="$ACR_NAME"
+
+      - name: Ensure runtime target port
+        run: |
+          az containerapp ingress enable \
+            --name "$CONTAINER_APP" \
+            --resource-group "$RESOURCE_GROUP" \
+            --type external \
+            --target-port 8000 \
+            --transport auto
