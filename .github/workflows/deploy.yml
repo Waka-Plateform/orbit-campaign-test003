@@ -43,24 +43,11 @@ jobs:
           az identity show --name "$MANAGED_IDENTITY" --resource-group "$RESOURCE_GROUP"
           az keyvault show --name "$KEY_VAULT" --resource-group "$RESOURCE_GROUP"
 
-      - name: Ensure Key Vault RBAC for campaign managed identity
+      - name: Verify Key Vault secrets are readable by deployment context
         run: |
-          MI_PRINCIPAL_ID=$(az identity show \
-            --name "$MANAGED_IDENTITY" \
-            --resource-group "$RESOURCE_GROUP" \
-            --query principalId \
-            --output tsv)
-          if [ -z "$MI_PRINCIPAL_ID" ]; then
-            echo "Managed identity principalId is empty"
-            exit 1
-          fi
-          az deployment group create \
-            --resource-group "$RESOURCE_GROUP" \
-            --template-file infra/keyvault.bicep \
-            --parameters keyVaultName="$KEY_VAULT" \
-                         managedIdentityPrincipalId="$MI_PRINCIPAL_ID"
-          echo "Waiting for Key Vault RBAC propagation"
-          sleep 90
+          for secret_name in acs-email-connection-string acs-sms-connection-string tracking-hmac-key; do
+            az keyvault secret show --vault-name "$KEY_VAULT" --name "$secret_name" --query id --output tsv
+          done
 
       - name: Build and push image with ACR
         run: |
